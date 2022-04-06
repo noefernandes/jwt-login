@@ -3,9 +3,8 @@ require('dotenv').config();
 
 const verifyJWT = (req, res, next) => {
     // Testa se tem o header authorization
-    const authHeader = req.headers['authorization'];
-    if (!authHeader) return res.sendStatus(401);
-    console.log(authHeader);
+    const authHeader = req.headers.authorization || req.headers.Authorization;
+    if (!authHeader?.startsWith('Bearer ')) return res.sendStatus(401);
     const token = authHeader.split(' ')[1];
     // Verifica se o token é válido
     jwt.verify(
@@ -13,7 +12,8 @@ const verifyJWT = (req, res, next) => {
         process.env.ACCESS_TOKEN_SECRET,
         (err, decoded) => {
             if (err) return res.sendStatus(403); //invalid token
-            req.user = decoded.username;
+            req.user = decoded.UserInfo.username;
+            req.roles = decoded.UserInfo.roles;
             next();
         }
     );

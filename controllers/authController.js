@@ -17,9 +17,15 @@ const handleLogin = async (req, res) => {
     // Testa se a senha é correta
     const match = await bcrypt.compare(pwd, foundUser.password);
     if (match) {
+        const roles = Object.values(foundUser.roles);
         // Criando JWTs
         const accessToken = jwt.sign(
-            { "username": foundUser.username },
+            {
+                "UserInfo": {
+                    "username": foundUser.username,
+                    "roles": roles
+                }
+            },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '30s' }
         );
@@ -28,7 +34,7 @@ const handleLogin = async (req, res) => {
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '1d' }
         );
-        // Saving refreshToken with current user
+        // Salvando o refresh token com o usuário
         const otherUsers = usersDB.users.filter(person => person.username !== foundUser.username);
         const currentUser = { ...foundUser, refreshToken };
         usersDB.setUsers([...otherUsers, currentUser]);

@@ -1,5 +1,4 @@
-//Site permitidos a fazer requisições
-const whitelist = ['http://localhost:3500', 'http://localhost:3000', 'https://www.google.com.br'];
+const allowedOrigins = require('./allowedOrigins');
 
 const corsOptions = {
     origin: (origin, callback) => {

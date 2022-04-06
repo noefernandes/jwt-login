@@ -6,7 +6,16 @@ const corsOptions = require('./config/cors');
 const errorHandler = require('./middleware/errorHandler');
 const verifyJWT = require('./middleware/verifyJWT');
 const cookieParser = require('cookie-parser');
+const credentials = require('./middleware/credentials');
 const PORT = process.env.PORT || 3500;
+
+// Usado antes da definição do cors
+// Manda a informação na resposta que o backend permite cookies nas requisições
+app.use(credentials);
+
+// Cross Origin Resource Sharing
+app.use(cors(corsOptions));
+
 
 //Para decodificar no formato form url encoded
 app.use(express.urlencoded({ extended: true }));
@@ -19,13 +28,11 @@ app.use(cookieParser());
 app.use('/register', require('./routes/register'));
 app.use('/auth', require('./routes/auth'));
 app.use('/refresh', require('./routes/refresh'));
+app.use('/logout', require('./routes/logout'));
 
 // Usa o verifyJWT para pedir token para as rotas abaixo
 app.use(verifyJWT);
 app.use('/employees', require('./routes/employees'));
-
-//Para gerenciar quais domínios podem fazer requisição
-app.use(cors(corsOptions));
 
 //Verificar erro para cada requisição
 app.use(errorHandler);
